@@ -2,18 +2,17 @@
   "name": "QuickAid – Erste Hilfe",
   "short_name": "QuickAid",
   "description": "Offline-fähiger Erste-Hilfe-Leitfaden für den Notfall",
-  "start_url": "./index.html",
+  "lang": "de",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f5f5f7",
-  "theme_color": "#ff3b30",
+  "theme_color": "#f5f5f7",
   "icons": [
-    {
-      "src": "./icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
