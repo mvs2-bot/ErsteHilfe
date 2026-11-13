@@ -128,7 +128,7 @@
     }
 
     .top-bar-row {
-      height: 52px;
+      height: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -138,23 +138,26 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 9px;
-      font-weight: 700;
-      font-size: 1.08rem;
-      letter-spacing: -0.015em;
+      gap: 10px;
+      min-width: 0;
     }
 
-    .brand-badge {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      background: var(--accent);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.1rem;
+    /* Logo und Titel wie im Dashboard und den anderen Apps (36px, 22px fett) */
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      flex: none;
+      display: block;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      white-space: nowrap;
     }
 
     .header-actions {
@@ -246,7 +249,7 @@
       padding: 14px;
       margin-bottom: 12px;
       box-shadow: var(--shadow);
-      scroll-margin-top: 66px;
+      scroll-margin-top: 70px;
     }
 
     .card-top {
@@ -878,8 +881,8 @@
     <div class="top-header-inner">
       <div class="top-bar-row">
         <div class="brand">
-          <div class="brand-badge">+</div>
-          <span>Erste Hilfe</span>
+          <img class="brand-logo" src="icon.svg" alt="">
+          <h1>Erste Hilfe</h1>
         </div>
         <div class="header-actions">
           <a href="tel:112" class="header-call-btn" aria-label="Notruf 112 anrufen">📞 112</a>
