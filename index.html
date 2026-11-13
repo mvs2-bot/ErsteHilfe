@@ -1,1 +1,1589 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f5f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="QuickAid" />
+  <title>QuickAid – Erste Hilfe</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --surface-2: #f2f2f7;
+      --text: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --border: rgba(0, 0, 0, 0.08);
+      --accent: #ff3b30;
+      --accent-soft: rgba(255, 59, 48, 0.12);
+      --blue: #007aff;
+      --blue-soft: rgba(0, 122, 255, 0.12);
+      --purple: #af52de;
+      --purple-soft: rgba(175, 82, 222, 0.12);
+      --green: #34c759;
+      --green-soft: rgba(52, 199, 89, 0.12);
+      --amber: #ff9500;
+      --amber-soft: rgba(255, 149, 0, 0.14);
+      --glass: rgba(255, 255, 255, 0.85);
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      --radius: 14px;
+    }
 
+    [data-theme="dark"] {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --surface-2: #2c2c2e;
+      --text: #f5f5f7;
+      --text-secondary: #98989d;
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #ff453a;
+      --accent-soft: rgba(255, 69, 58, 0.16);
+      --blue: #0a84ff;
+      --blue-soft: rgba(10, 132, 255, 0.16);
+      --purple: #bf5af2;
+      --purple-soft: rgba(191, 90, 242, 0.16);
+      --green: #30d158;
+      --green-soft: rgba(48, 209, 88, 0.16);
+      --amber: #ff9f0a;
+      --amber-soft: rgba(255, 159, 10, 0.16);
+      --glass: rgba(28, 28, 30, 0.85);
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      font-size: 15px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: calc(134px + env(safe-area-inset-bottom, 0px));
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    body.no-subbar {
+      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Kompakter Sticky Top Header */
+    .top-header {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding-top: env(safe-area-inset-top, 0px);
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+    }
+
+    .top-header-inner {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .top-bar-row {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 700;
+      font-size: 1.08rem;
+      letter-spacing: -0.015em;
+    }
+
+    .brand-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 1. Prominenter 112 Notruf-Button im Header */
+    .header-call-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.84rem;
+      letter-spacing: -0.01em;
+      box-shadow: 0 2px 8px rgba(255, 59, 48, 0.32);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .header-call-btn:active {
+      transform: scale(0.94);
+    }
+
+    .theme-toggle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.92);
+    }
+
+    .theme-toggle svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    /* Main Layout */
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 14px 16px;
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.18s ease;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sub-panel {
+      display: none;
+      animation: fadeIn 0.16s ease;
+    }
+
+    .sub-panel.active {
+      display: block;
+    }
+
+    /* Cards & Blocks */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      scroll-margin-top: 66px;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .pill-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .pill-tag.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .pill-tag.amber {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .pill-tag.green {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    /* Gender Grid */
+    .gender-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 560px) {
+      .gender-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+
+    .gender-box {
+      background: var(--surface-2);
+      border-radius: 11px;
+      padding: 10px 12px;
+      border-left: 3px solid transparent;
+    }
+
+    .gender-box.women { border-left-color: var(--purple); }
+    .gender-box.men { border-left-color: var(--blue); }
+
+    .gender-head {
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .gender-box.women .gender-head { color: var(--purple); }
+    .gender-box.men .gender-head { color: var(--blue); }
+
+    .compact-list {
+      list-style: none;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    .compact-list li {
+      position: relative;
+      padding-left: 12px;
+      margin-bottom: 5px;
+    }
+
+    .compact-list li:last-child { margin-bottom: 0; }
+
+    .compact-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--text-secondary);
+    }
+
+    /* Action Box */
+    .action-box {
+      background: var(--accent-soft);
+      border-radius: 11px;
+      padding: 11px 12px;
+    }
+
+    .action-head {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mini-call {
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+
+    .action-list {
+      padding-left: 16px;
+      font-size: 0.85rem;
+    }
+
+    .action-list li {
+      margin-bottom: 3.5px;
+    }
+
+    .action-list li:last-child { margin-bottom: 0; }
+
+    /* FAST Mini Row */
+    .fast-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 520px) {
+      .fast-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .fast-chip {
+      background: var(--surface-2);
+      border-radius: 9px;
+      padding: 7px 9px;
+      font-size: 0.78rem;
+    }
+
+    .fast-chip strong {
+      color: var(--accent);
+      font-size: 0.88rem;
+      margin-right: 3px;
+    }
+
+    /* Guide Steps */
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 10px;
+      background: var(--surface-2);
+      border-radius: 11px;
+      margin-bottom: 8px;
+    }
+
+    .step-item:last-child { margin-bottom: 0; }
+
+    .step-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.76rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-badge.blue { background: var(--blue); }
+    .step-badge.green { background: var(--green); }
+
+    .step-text h4 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .step-text p {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+    }
+
+    /* 2. Interaktiver HLW-Taktgeber (110 BPM) */
+    .cpr-metro-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .cpr-metro-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pulse-orb {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      transition: transform 0.08s ease, background-color 0.08s ease, color 0.08s ease;
+    }
+
+    .pulse-orb.beat {
+      transform: scale(1.18);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .cpr-metro-info strong {
+      display: block;
+      font-size: 0.86rem;
+    }
+
+    .cpr-metro-info span {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    .cpr-metro-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .metro-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      white-space: nowrap;
+      transition: transform 0.12s ease;
+    }
+
+    .metro-btn:active {
+      transform: scale(0.95);
+    }
+
+    .metro-btn.running {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .sound-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    /* 3. Schnellfilter-Leiste & Akkordeons im Panel Spezial */
+    .quick-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .qf-chip {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: all 0.14s ease;
+    }
+
+    .qf-chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    details.trauma-acc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 9px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    details.trauma-acc summary {
+      list-style: none;
+      padding: 12px 14px;
+      font-size: 0.94rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    details.trauma-acc summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.trauma-acc summary::after {
+      content: "›";
+      font-size: 1.25rem;
+      line-height: 1;
+      color: var(--text-secondary);
+      transition: transform 0.18s ease;
+    }
+
+    details.trauma-acc[open] summary::after {
+      transform: rotate(90deg);
+    }
+
+    details.trauma-acc .acc-body {
+      padding: 0 14px 13px 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+
+    /* Info Tab */
+    .emergency-banner {
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .emergency-banner-left strong {
+      font-size: 1.55rem;
+      line-height: 1.1;
+      display: block;
+      letter-spacing: -0.02em;
+    }
+
+    .emergency-banner-left span {
+      font-size: 0.8rem;
+      opacity: 0.92;
+    }
+
+    .call-pill-white {
+      background: #fff;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.86rem;
+      padding: 8px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .w-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 560px) {
+      .w-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .w-box {
+      background: var(--surface-2);
+      border-radius: 9px;
+      padding: 7px 9px;
+      font-size: 0.78rem;
+    }
+
+    .w-box strong {
+      display: block;
+      color: var(--accent);
+      font-size: 0.82rem;
+    }
+
+    .num-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 11px;
+      background: var(--surface-2);
+      border-radius: 10px;
+      margin-bottom: 7px;
+      gap: 10px;
+    }
+
+    .num-row:last-child { margin-bottom: 0; }
+
+    .num-row-info strong {
+      display: block;
+      font-size: 0.86rem;
+    }
+
+    .num-row-info span {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .num-btn {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--blue);
+      background: var(--blue-soft);
+      padding: 5px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .num-btn.red {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* =====================================================================
+       Zweite schwebende Sub-Bar direkt über der Haupt-Tabbar
+       ===================================================================== */
+    .subbar-wrap {
+      position: fixed;
+      z-index: 46;
+      left: calc(12px + env(safe-area-inset-left, 0px));
+      right: calc(12px + env(safe-area-inset-right, 0px));
+      bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      max-width: 540px;
+      margin: 0 auto;
+      pointer-events: none;
+    }
+
+    .subbar {
+      display: none;
+      grid-template-columns: repeat(4, 1fr);
+      height: 46px;
+      padding: 0 5px;
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .16), 0 0 0 .5px rgba(0, 0, 0, .06);
+      pointer-events: auto;
+      animation: subbarPop 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .subbar.visible {
+      display: grid;
+    }
+
+    [data-theme="dark"] .subbar {
+      background: #2c2c2e;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .6), 0 0 0 .5px rgba(255, 255, 255, .1);
+    }
+
+    @keyframes subbarPop {
+      from { opacity: 0; transform: translateY(6px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .seg-btn {
+      position: relative;
+      z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: 0;
+      padding: 0 4px;
+      font-family: inherit;
+      font-size: 0.77rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      transition: color 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 380px) {
+      .seg-btn {
+        font-size: 0.71rem;
+        padding: 0 2px;
+      }
+    }
+
+    .seg-btn.active::before {
+      content: "";
+      position: absolute;
+      inset: 5px 3px;
+      z-index: -1;
+      border-radius: 15px;
+      background: var(--accent-soft);
+    }
+
+    .seg-btn.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* =====================================================================
+       Schwebende Haupt-Tab-Leiste unten (exakt aus KopfschmerzTracker)
+       ===================================================================== */
+    .tabbar {
+      position: fixed;
+      z-index: 45;
+      left: calc(12px + env(safe-area-inset-left, 0px));
+      right: calc(12px + env(safe-area-inset-right, 0px));
+      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      max-width: 540px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      height: 62px;
+      padding: 0 6px;
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .16), 0 0 0 .5px rgba(0, 0, 0, .06);
+    }
+
+    [data-theme="dark"] .tabbar {
+      background: #2c2c2e;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .6), 0 0 0 .5px rgba(255, 255, 255, .1);
+    }
+
+    .tabbar button {
+      position: relative;
+      z-index: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 0;
+      border: 0;
+      background: none;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .tabbar button .ic {
+      width: 24px;
+      height: 24px;
+      flex: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tabbar button[aria-current="page"]::before {
+      content: "";
+      position: absolute;
+      inset: 7px 6px;
+      z-index: -1;
+      border-radius: 16px;
+      background: var(--accent-soft);
+    }
+
+    .tabbar button[aria-current="page"] {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .tabbar button[aria-current="page"] .ic {
+      stroke-width: 2.2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Kompakter Sticky Top Header mit direktem 112-Notruf-Button -->
+  <header class="top-header">
+    <div class="top-header-inner">
+      <div class="top-bar-row">
+        <div class="brand">
+          <div class="brand-badge">+</div>
+          <span>Erste Hilfe</span>
+        </div>
+        <div class="header-actions">
+          <a href="tel:112" class="header-call-btn" aria-label="Notruf 112 anrufen">📞 112</a>
+          <button id="themeToggle" class="theme-toggle" type="button" aria-label="Farbschema wechseln" title="Hell / Dunkel wechseln">
+            <svg id="iconSun" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ==================== TAB 1: START (AKUT-NOTFÄLLE) ==================== -->
+    <section id="view-start" class="view active">
+      <!-- PANEL 1: HERZINFARKT -->
+      <div id="panel-herz" class="sub-panel active" data-group="start">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">❤️ Herzinfarkt erkennen</div>
+            <span class="pill-tag">Notruf 112</span>
+          </div>
+
+          <div class="gender-grid">
+            <div class="gender-box women">
+              <div class="gender-head">♀ Frauen (oft unspezifisch)</div>
+              <ul class="compact-list">
+                <li><strong>Kurzatmigkeit / Atemnot</strong></li>
+                <li><strong>Übelkeit, Erbrechen</strong>, Magendruck</li>
+                <li>Schmerzen in <strong>Oberbauch, Rücken</strong> oder Schulterblättern</li>
+                <li>Druck-/Engegefühl in der Brust</li>
+                <li>Extreme Müdigkeit, Schwindel, kalter Schweiß</li>
+              </ul>
+            </div>
+            <div class="gender-box men">
+              <div class="gender-head">♂ Männer (oft klassisch)</div>
+              <ul class="compact-list">
+                <li><strong>Starke Brustschmerzen</strong> (&gt; 5 Min. bis „Vernichtungsschmerz“)</li>
+                <li>Ausstrahlung in <strong>linken Arm</strong>, Schulter, Hals, Kiefer oder Oberbauch</li>
+                <li>Massives <strong>Engegefühl</strong> („Elefant auf der Brust“)</li>
+                <li>Kaltschweißigkeit, blasse Haut</li>
+                <li>Atemnot, Unruhe, Todesangst</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="action-box">
+            <div class="action-head">
+              <span>⚡ Sofortmaßnahmen</span>
+              <a href="tel:112" class="mini-call">📞 112 wählen</a>
+            </div>
+            <ol class="action-list">
+              <li><strong>Sofort 112 anrufen</strong> und Verdacht auf Herzinfarkt nennen.</li>
+              <li><strong>Oberkörper erhöht lagern</strong> (entlastet das Herz, Wunsch des Betroffenen beachten), nicht flach hinlegen.</li>
+              <li><strong>Enge Kleidung öffnen</strong>, für frische Luft sorgen, beruhigen &amp; ununterbrochen betreuen.</li>
+              <li>Keine Anstrengung (nicht selbst fahren!). Bei Atemstillstand: <strong>Herzdruckmassage</strong> (100–120×/Min.).</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: SCHLAGANFALL -->
+      <div id="panel-schlag" class="sub-panel" data-group="start">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">🧠 Schlaganfall erkennen</div>
+            <span class="pill-tag">FAST-Test</span>
+          </div>
+
+          <div class="fast-row">
+            <div class="fast-chip"><strong>F</strong>Face: Hängt ein Mundwinkel / Augenlid?</div>
+            <div class="fast-chip"><strong>A</strong>Arms: Sinkt ein Arm beim Vorstrecken ab?</div>
+            <div class="fast-chip"><strong>S</strong>Speech: Klingt ein einfacher Satz verwaschen?</div>
+            <div class="fast-chip"><strong>T</strong>Time: Sofort 112 wählen &amp; Uhrzeit merken!</div>
+          </div>
+
+          <div class="gender-grid">
+            <div class="gender-box women">
+              <div class="gender-head">♀ Zusätzliche Anzeichen bei Frauen</div>
+              <ul class="compact-list">
+                <li>Plötzliche <strong>Verwirrtheit</strong>, Desorientierung</li>
+                <li>Übelkeit, Erbrechen, plötzlicher Schluckauf</li>
+                <li>Allgemeine Schwäche oder kurze Ohnmacht</li>
+                <li>Plötzlich extrem starke Kopfschmerzen</li>
+              </ul>
+            </div>
+            <div class="gender-box men">
+              <div class="gender-head">♂ Typische Anzeichen bei Männern</div>
+              <ul class="compact-list">
+                <li>Plötzliche <strong>halbseitige Lähmung</strong> / Taubheit</li>
+                <li>Sprach- oder Wortfindungsstörungen</li>
+                <li>Plötzlicher Drehschwindel &amp; Gangunsicherheit</li>
+                <li>Sehstörungen / Doppelbilder auf einem Auge</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="action-box">
+            <div class="action-head">
+              <span>⚡ Sofortmaßnahmen</span>
+              <a href="tel:112" class="mini-call">📞 112 wählen</a>
+            </div>
+            <ol class="action-list">
+              <li><strong>Sofort 112 wählen</strong> und genaue <strong>Uhrzeit des Symptombeginns</strong> notieren.</li>
+              <li><strong>Oberkörper leicht erhöht (30°)</strong> lagern; bei Bewusstlosigkeit <strong>stabile Seitenlage</strong>.</li>
+              <li><strong>Nichts zu essen oder zu trinken geben!</strong> (Akute Erstickungsgefahr durch Schluckstörung/Aspiration).</li>
+              <li>Enge Kleidung lockern, Zahnprothesen ggf. entfernen und Vitalfunktionen überwachen.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 3: LUNGENEMBOLIE -->
+      <div id="panel-lunge" class="sub-panel" data-group="start">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">🫁 Lungenembolie erkennen</div>
+            <span class="pill-tag">Notruf 112</span>
+          </div>
+
+          <div class="gender-grid">
+            <div class="gender-box women">
+              <div class="gender-head">♀ Besonderheiten bei Frauen</div>
+              <ul class="compact-list">
+                <li>Oft zunächst <strong>schleichende Luftnot</strong> bei geringer Belastung</li>
+                <li>Starkes Herzklopfen, Schwindel oder Ohnmacht</li>
+                <li>Engegefühl &amp; Angst (oft mit Panikattacke verwechselt)</li>
+                <li>Erhöhtes Risiko bei Pille, Schwangerschaft oder langen Reisen</li>
+              </ul>
+            </div>
+            <div class="gender-box men">
+              <div class="gender-head">♂ Typische Anzeichen bei Männern</div>
+              <ul class="compact-list">
+                <li><strong>Plötzlich einsetzende Atemnot</strong></li>
+                <li><strong>Stechende Brustschmerzen</strong> beim tiefen Einatmen</li>
+                <li>Herzrasen, Schweißausbruch, Blässe</li>
+                <li>Husten (evtl. blutiger Auswurf) &amp; <strong>Wadenschmerz / Beinschwellung</strong></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="action-box">
+            <div class="action-head">
+              <span>⚡ Sofortmaßnahmen</span>
+              <a href="tel:112" class="mini-call">📞 112 wählen</a>
+            </div>
+            <ol class="action-list">
+              <li><strong>Sofort 112 wählen</strong> und Verdacht auf Lungenembolie melden.</li>
+              <li><strong>Absolute Ruhe – nicht mehr bewegen!</strong> Bewegung kann weitere Gerinnsel lösen.</li>
+              <li><strong>Oberkörper erhöht lagern</strong>, enge Kleidung öffnen und für frische Luft sorgen.</li>
+              <li>Betroffene beruhigen und Atmung/Bewusstsein bis zum Eintreffen des Rettungsdienstes prüfen.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 4: ATEMNOT & VERSCHLUCKEN -->
+      <div id="panel-atem" class="sub-panel" data-group="start">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">😮‍💨 Verschlucken (Erstickungsgefahr)</div>
+            <span class="pill-tag">5 : 5 Wechsel</span>
+          </div>
+          <div class="step-item">
+            <div class="step-badge">1</div>
+            <div class="step-text">
+              <h4>Zum Husten ermutigen &amp; 5× Rückenschläge</h4>
+              <p>Solange kräftiges Husten möglich ist: zum Husten auffordern. Bei schwerer Atemnot Oberkörper weit nach vorn beugen (Kleinkinder bäuchlings über den Unterarm/Oberschenkel legen) und bis zu <strong>5 kräftige Schläge mit der flachen Hand zwischen die Schulterblätter</strong> geben.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-badge">2</div>
+            <div class="step-text">
+              <h4>5× Oberbauchkompression (Heimlich-Handgriff)</h4>
+              <p>Wenn sich der Fremdkörper nicht löst: Von hinten umfassen, eine Faust in den <strong>Oberbauch unterhalb des Brustbeins</strong> legen, mit der anderen Hand umgreifen und bis zu <strong>5-mal ruckartig kräftig nach hinten oben</strong> ziehen. Im Wechsel (5 : 5) wiederholen. Bei Bewusstlosigkeit sofort <strong>112 &amp; Wiederbelebung</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">🐝 Schwellung der Atemwege &amp; Asthma</div>
+            <span class="pill-tag blue">Oberkörper hoch</span>
+          </div>
+          <ul class="compact-list">
+            <li><strong>Insektenstich / Schwellung im Hals:</strong> Sofort <strong>112 wählen</strong>. Betroffene <strong>Eiswürfel lutschen</strong> oder mit kaltem Wasser gurgeln lassen und <strong>kalte Halsumschläge</strong> anlegen.</li>
+            <li><strong>Akuter Asthmaanfall:</strong> Ruhe ausstrahlen, Fenster öffnen, enge Kleidung lockern, Notfallspray anreichen und <strong>aufrecht nach Wunsch des Betroffenen</strong> lagern (niemals zum Hinlegen zwingen!).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: LEITFADEN ==================== -->
+    <section id="view-guide" class="view">
+      <!-- PANEL 1: AUTOUNFALL -->
+      <div id="panel-auto" class="sub-panel active" data-group="guide">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">🚗 Unfallstelle absichern &amp; Notruf</div>
+            <span class="pill-tag">Eigenschutz</span>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge">1</div>
+            <div class="step-text">
+              <h4>Warnblinker &amp; Warnweste anlegen</h4>
+              <p>Eigenes Fahrzeug sicher am Rand abstellen (Kofferraumdeckel als Blickfang öffnen), <strong>Warnblinkanlage</strong> einschalten und <strong>Warnweste noch im Auto anziehen</strong>. Auf der verkehrsabgewandten Seite aussteigen.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge">2</div>
+            <div class="step-text">
+              <h4>Warndreieck aufstellen</h4>
+              <p>Aufgeklappt vor dem Körper tragen. Abstand zur Unfallstelle: <strong>Innerorts 50 m</strong>, <strong>Landstraße 100 m</strong>, <strong>Autobahn 150–200 m</strong> (immer vor Kurven/Bergkuppen).</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge">3</div>
+            <div class="step-text">
+              <h4>Notruf 112, Zündung &amp; Gefahrgut prüfen</h4>
+              <p><strong>Zündung ausschalten</strong> (wichtig, falls Airbags noch nicht ausgelöst haben!) und Handbremse ziehen. Bei LKW mit <strong>orangefarbenen Gefahrgut-Warntafeln</strong> beide Zahlenreihen (Gefahr / Stoff) unbedingt beim Notruf 112 durchgeben.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">⛑️ Rettung aus PKW &amp; Motorradhelm</div>
+            <span class="pill-tag blue">Rautek-Griff</span>
+          </div>
+          <ul class="compact-list">
+            <li><strong>Rautek-Rettungsgriff aus dem PKW:</strong> Gurt lösen/durchschneiden, Füße befreien. Von hinten unter beiden Achseln durchgreifen, einen Unterarm des Verletzten anwinkeln, mit beiden Händen von oben umfassen, auf den eigenen Oberschenkel ziehen und rückwärts aus der Gefahrenzone bringen.</li>
+            <li><strong>Motorradhelm abnehmen – ja oder nein?</strong> Bei <strong>Bewusstlosigkeit oder Atemstillstand immer abnehmen</strong> (sonst ist keine Atemkontrolle/Wiederbelebung möglich). Idealerweise zu zweit: Helfer 1 stabilisiert Hals/Kopf, Helfer 2 öffnet Visier &amp; Kinnriemen, übernimmt die Halsstabilisierung von unten, während Helfer 1 den Helm vorsichtig nach hinten/oben abzieht.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PANEL 2: UNFALL DAHEIM (BLUTUNG, SCHOCK, STROM) -->
+      <div id="panel-daheim" class="sub-panel" data-group="guide">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">🏠 Stromunfall &amp; Eigenschutz daheim</div>
+            <span class="pill-tag">Sicherheit zuerst</span>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge blue">1</div>
+            <div class="step-text">
+              <h4>Haushaltsstrom vs. Hochspannung</h4>
+              <p><strong>Haushalt (230 V):</strong> Nie direkt anfassen – erst Netzstecker ziehen oder Sicherung abschalten! <strong>Hochspannung (Warnschild Blitz):</strong> Mindestens <strong>5 m Sicherheitsabstand</strong> (bei Bodenkontakt der Leitung <strong>10 m</strong>) einhalten, bis Fachpersonal die Abschaltung bestätigt!</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge blue">2</div>
+            <div class="step-text">
+              <h4>Starke Blutung stillen &amp; Amputat sichern</h4>
+              <p>Einmalhandschuhe anziehen, betroffenes Körperteil <strong>hochhalten</strong>, keimfreie Wundauflage fest <strong>aufpressen</strong> und einen <strong>Druckverband</strong> anlegen (blutet es durch: zweites Druckpolster darüber wickeln).<br>
+              <strong>Abgetrennte Körperteile (Amputate):</strong> Nicht waschen! Trocken in steriles Verbandtuch wickeln, in einen wasserdichten Beutel packen und diesen in einen zweiten Beutel mit Eiswasser legen.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge green">3</div>
+            <div class="step-text">
+              <h4>Schock erkennen &amp; Schocklage richtig anwenden</h4>
+              <p><strong>Anzeichen:</strong> Blasse/kalte Haut, kalter Schweiß auf der Stirn, Frieren, Unruhe.<br>
+              <strong>Maßnahme:</strong> Flach hinlegen, <strong>Beine ca. 30 cm erhöht lagern</strong>, zudecken, beruhigen. <em>Ess-, Trink- und Rauchverbot!</em><br>
+              <strong>⚠️ Keine Schocklage bei:</strong> Bewusstlosigkeit, Kopf-/Brust-/Bauchverletzungen, Wirbelsäulen-/Becken-/Beinbrüchen sowie Atemnot oder Herzbeschwerden!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 3: WIEDERBELEBUNG & SEITENLAGE + INTERAKTIVER TAKTGEBER -->
+      <div id="panel-cpr" class="sub-panel" data-group="guide">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">🫀 Keine Atmung – Wiederbelebung</div>
+            <span class="pill-tag">30 : 2 Rhythmus</span>
+          </div>
+
+          <!-- 2. Interaktiver HLW-Taktgeber (110 BPM) -->
+          <div class="cpr-metro-box">
+            <div class="cpr-metro-left">
+              <div id="pulseOrb" class="pulse-orb">110</div>
+              <div class="cpr-metro-info">
+                <strong>HLW-Taktgeber (110 / Min.)</strong>
+                <span id="metroCountText">Rhythmus: „Stayin’ Alive“ • 30× drücken</span>
+              </div>
+            </div>
+            <div class="cpr-metro-controls">
+              <button id="soundToggleBtn" class="sound-btn" type="button" title="Ton an/aus" aria-label="Taktgeber-Ton umschalten">🔊</button>
+              <button id="metroToggleBtn" class="metro-btn" type="button">▶ Start</button>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge">1</div>
+            <div class="step-text">
+              <h4>Bewusstsein &amp; Atmung prüfen (max. 10 Sek.)</h4>
+              <p>Laut ansprechen, an Schultern rütteln. Keine Reaktion? Kopf nackenwärts überstrecken, Kinn anheben und <strong>sehen, hören, fühlen</strong>, ob eine normale Atmung vorhanden ist. Wenn nicht: sofort <strong>112 wählen &amp; Defibrillator (AED)</strong> holen lassen.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge">2</div>
+            <div class="step-text">
+              <h4>30× Herzdruckmassage &amp; 2× Beatmung</h4>
+              <p>Auf hartem Untergrund flach auf den Rücken legen. Handballen auf die <strong>Mitte des Brustkorbs</strong> setzen, Arme durchstrecken und <strong>30-mal 5–6 cm tief drücken</strong> (Tempo: <strong>100–120×/Min.</strong>). Danach Kopf überstrecken, Nase zuhalten und <strong>2-mal beatmen</strong> (Brustkorb hebt sich). Ohne Beatmungstuch durchgehend drücken.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-badge green">3</div>
+            <div class="step-text">
+              <h4>AED anschließen &amp; Abbruchkriterien</h4>
+              <p>AED einschalten und Sprachanweisungen befolgen (während der Schockabgabe niemanden berühren!). Wiederbelebung <strong>nicht abbrechen</strong>, bis eigenständige Atmung/Bewegung einsetzt oder der Rettungsdienst übernimmt. Bei Erholung den AED <strong>nicht ausschalten</strong> und Elektroden kleben lassen.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">🛌 Bewusstlos + Atmung vorhanden: Stabile Seitenlage</div>
+            <span class="pill-tag blue">4 Schritte</span>
+          </div>
+          <ol class="action-list">
+            <li>Seitlich neben der Person knien (Brille abnehmen) und den <strong>zugewandten Arm angewinkelt nach oben</strong> legen.</li>
+            <li>Die <strong>gegenüberliegende Hand</strong> mit dem Handrücken an die Ihnen zugewandte <strong>Wange legen</strong> und dort festhalten.</li>
+            <li>Am <strong>gegenüberliegenden Oberschenkel</strong> greifen, Bein anwinkeln und die Person zu sich herüberziehen (oberes Bein im rechten Winkel zur Hüfte lagern).</li>
+            <li><strong>Kopf nackenwärts überstrecken</strong> und <strong>Mund erdwärts leicht öffnen</strong>, damit Speichel/Erbrochenes abfließen kann. Atmung regelmäßig prüfen!</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- PANEL 4: SPEZIALFÄLLE MIT SCHNELLFILTER & AKKORDEONS -->
+      <div id="panel-trauma" class="sub-panel" data-group="guide">
+        <!-- 3. Schnellfilter-Leiste -->
+        <div class="quick-filter-bar" role="group" aria-label="Spezialfall auswählen">
+          <button type="button" class="qf-chip active" data-target-acc="all">Alle (6)</button>
+          <button type="button" class="qf-chip" data-target-acc="acc-brand">🔥 Verbrennung</button>
+          <button type="button" class="qf-chip" data-target-acc="acc-aetz">🧪 Verätzung</button>
+          <button type="button" class="qf-chip" data-target-acc="acc-kaelte">❄️ Unterkühlung</button>
+          <button type="button" class="qf-chip" data-target-acc="acc-krampf">⚡ Krampfanfall</button>
+          <button type="button" class="qf-chip" data-target-acc="acc-kopf">☀️ Kopf / Sonne</button>
+          <button type="button" class="qf-chip" data-target-acc="acc-bruch">🦴 Knochenbruch</button>
+        </div>
+
+        <details id="acc-brand" class="trauma-acc" open>
+          <summary>🔥 Verbrennungen &amp; Verbrühungen</summary>
+          <div class="acc-body">
+            <ul class="compact-list">
+              <li><strong>Kleinflächig (z. B. Hand/Finger):</strong> Sofort max. <strong>10 Minuten mit handwarmem, fließendem Wasser</strong> kühlen (Schmerzlinderung).</li>
+              <li><strong>Großflächig:</strong> <strong>Nicht mit kaltem Wasser kühlen</strong> (akute Unterkühlungsgefahr!). Wunden locker und keimfrei mit Verbandtuch abdecken.</li>
+              <li><strong>Wichtig:</strong> Festklebende Kleidung oder eingebrannte Stoffe niemals abreißen, sondern auf der Haut belassen.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details id="acc-aetz" class="trauma-acc" open>
+          <summary>🧪 Verätzungen (Auge, Haut &amp; Verschlucken)</summary>
+          <div class="acc-body">
+            <ul class="compact-list">
+              <li><strong>Verätzung am Auge:</strong> Sofort mindestens <strong>20 Minuten</strong> unter fließendem Wasser spülen – Kopf dabei zur <strong>verätzten Seite neigen</strong> und vom inneren Augenwinkel nach außen spülen, damit das gesunde Auge geschützt bleibt. Danach beide Augen ruhigstellen/verbinden.</li>
+              <li><strong>Hautkontakt:</strong> Benetzte Kleidung unter Eigenschutz (Handschuhe) entfernen und Haut ausgiebig spülen.</li>
+              <li><strong>Verschlucken von Säuren/Laugen:</strong> <strong>Kein Erbrechen auslösen!</strong> Wasser in kleinen Schlucken trinken lassen und 112 wählen (Verpackung/Etikett für Rettungsdienst bereitlegen).</li>
+            </ul>
+          </div>
+        </details>
+
+        <details id="acc-kaelte" class="trauma-acc" open>
+          <summary>❄️ Unterkühlung &amp; Erfrierungen</summary>
+          <div class="acc-body">
+            <ul class="compact-list">
+              <li><strong>Nicht bewegen oder massieren!</strong> Betroffene weder aktiv noch passiv bewegen (Gefahr des „Bergungstods“ durch kaltes Blut aus Armen/Beinen Richtung Herz!).</li>
+              <li><strong>Wärmeerhalt:</strong> Nasse Kleidung vorsichtig entfernen, Körperstamm warm einhüllen (Rettungsdecke: Silber zum Körper) und vor Wind schützen.</li>
+              <li><strong>Getränke:</strong> Nur bei <strong>vollem Bewusstsein</strong> warme, gezuckerte Getränke geben – <strong>niemals Alkohol</strong>!</li>
+            </ul>
+          </div>
+        </details>
+
+        <details id="acc-krampf" class="trauma-acc" open>
+          <summary>⚡ Hirnbedingter Krampfanfall</summary>
+          <div class="acc-body">
+            <ul class="compact-list">
+              <li><strong>Verletzungsschutz:</strong> Gefährliche Gegenstände aus der unmittelbaren Umgebung wegräumen, Kopf weich unterpolstern.</li>
+              <li><strong>Niemals festhalten:</strong> Die krampfende Person nicht mit Gewalt fixieren und <strong>nichts zwischen die Zähne schieben</strong>.</li>
+              <li><strong>Nach dem Anfall:</strong> Atmung prüfen, Betroffene in die <strong>stabile Seitenlage</strong> bringen und Notruf 112 wählen.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details id="acc-kopf" class="trauma-acc" open>
+          <summary>☀️ Kopfverletzung &amp; Sonnenstich</summary>
+          <div class="acc-body">
+            <ul class="compact-list">
+              <li><strong>Gewalteinwirkung auf den Kopf:</strong> Betroffene unbedingt liegen lassen (ein Arzt entscheidet über das Aufstehen!). Bei Bewusstlosigkeit stabile Seitenlage, bei Erbrechen Atemwege freihalten.</li>
+              <li><strong>Sonnenstich (hochroter, heißer Kopf, Nackensteifheit, Übelkeit):</strong> Sofort aus der Sonne in den Schatten bringen, <strong>Oberkörper leicht erhöht lagern</strong> und Kopf/Nacken mit feuchten, kühlen Tüchern kühlen.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details id="acc-bruch" class="trauma-acc" open>
+          <summary>🦴 Knochenbrüche &amp; Wirbelsäule</summary>
+          <div class="acc-body">
+            <ul class="compact-list">
+              <li><strong>Arm-/Beinbruch:</strong> Verletzten Körperteil nicht unnötig bewegen oder einrenken, sondern in der vorgefundenen Lage durch Polsterung ruhigstellen.</li>
+              <li><strong>Offener Bruch:</strong> Wunde keimfrei abdecken, ohne Druck auf herausstehende Knochenteile auszuüben.</li>
+              <li><strong>Verdacht auf Wirbelsäulenverletzung:</strong> Person <strong>in der vorgefundenen Lage belassen</strong> und nicht umlagern (außer bei akuter Lebensgefahr oder fehlender Atmung).</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: INFOS ==================== -->
+    <section id="view-info" class="view">
+      <div class="emergency-banner">
+        <div class="emergency-banner-left">
+          <strong>Notruf 112</strong>
+          <span>Rettungsdienst &amp; Feuerwehr • Kostenlos • 24/7</span>
+        </div>
+        <a href="tel:112" class="call-pill-white">📞 112 anrufen</a>
+      </div>
+
+      <div class="card">
+        <div class="card-top">
+          <div class="card-title">📋 Die 5 W-Fragen beim Notruf</div>
+          <span class="pill-tag">Nicht auflegen!</span>
+        </div>
+        <div class="w-grid">
+          <div class="w-box"><strong>1. Wo?</strong>Ort, Straße, Hausnr., Etage</div>
+          <div class="w-box"><strong>2. Was?</strong>Art des Notfalls / Unfalls</div>
+          <div class="w-box"><strong>3. Wie viele?</strong>Anzahl Verletzte</div>
+          <div class="w-box"><strong>4. Welche?</strong>Art der Verletzung</div>
+          <div class="w-box"><strong>5. Warten!</strong>Auf Rückfragen warten</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top">
+          <div class="card-title">☎️ Wichtige Rufnummern</div>
+        </div>
+
+        <div class="num-row">
+          <div class="num-row-info">
+            <strong>Polizei Notruf</strong>
+            <span>Unfälle, Gefahrenlagen, Straftaten</span>
+          </div>
+          <a href="tel:110" class="num-btn red">110</a>
+        </div>
+
+        <div class="num-row">
+          <div class="num-row-info">
+            <strong>Ärztlicher Bereitschaftsdienst</strong>
+            <span>Akute Beschwerden außerhalb der Praxiszeiten (bundesweit)</span>
+          </div>
+          <a href="tel:116117" class="num-btn">116 117</a>
+        </div>
+
+        <div class="num-row">
+          <div class="num-row-info">
+            <strong>Giftnotruf (24/7 Beratung)</strong>
+            <span>Zuständig für ganz Bayern (München) &amp; deutschlandweite Hilfe</span>
+          </div>
+          <a href="tel:+498919240" class="num-btn">089 19240</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top">
+          <div class="card-title">💡 Praxis-Wissen &amp; Merkhilfen (Malteser)</div>
+          <span id="offlineBadge" class="pill-tag green" style="display:none;">✓ Offline bereit</span>
+        </div>
+        <ul class="compact-list">
+          <li><strong>Wundversorgung &amp; Fremdkörper:</strong> Jede Wunde keimfrei abdecken (spätestens nach 6 Stunden ärztlich versorgen lassen). <strong>Fremdkörper in Wunden niemals selbst entfernen</strong>, sondern weich umpolstern!</li>
+          <li><strong>Psychologische Erste Hilfe:</strong> Mit Namen vorstellen, Blickkontakt halten, vorsichtig die Hand halten, informieren was geschieht und den Betroffenen vor Schaulustigen abschirmen.</li>
+          <li><strong>Notrufsäulen auf Autobahnen &amp; Bundesstraßen:</strong> Schwarze Pfeilmarkierungen oben an den Leitpfosten zeigen den kürzesten Weg zur nächsten kostenlosen Notrufsäule.</li>
+          <li><strong>Rettungsdecke:</strong> <strong>Silber zum Körper</strong> = wärmt (Schutz vor Unterkühlung, Standardfall). <strong>Gold zum Körper</strong> = schützt vor Sonne/Hitze.</li>
+          <li><strong>Rechtsschutz &amp; Rettungsgasse:</strong> Ersthelfer sind gesetzlich unfallversichert und haften nicht für unabsichtliche Schäden. Bei Stau sofort Rettungsgasse bilden (ganz links nach links, alle anderen nach rechts).</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Zweite schwebende Sub-Bar über der Haupt-Tabbar (verschwindet bei Tab "Infos") -->
+  <div class="subbar-wrap">
+    <!-- Sub-Bar für START (4 Kategorien) -->
+    <div id="subnav-start" class="subbar visible" role="tablist" aria-label="Notfall auswählen">
+      <button class="seg-btn active" type="button" data-group="start" data-panel="panel-herz">❤️ Herz</button>
+      <button class="seg-btn" type="button" data-group="start" data-panel="panel-schlag">🧠 Schlaganfall</button>
+      <button class="seg-btn" type="button" data-group="start" data-panel="panel-lunge">🫁 Lunge</button>
+      <button class="seg-btn" type="button" data-group="start" data-panel="panel-atem">😮‍💨 Atemnot</button>
+    </div>
+
+    <!-- Sub-Bar für LEITFADEN (4 Kategorien) -->
+    <div id="subnav-guide" class="subbar" role="tablist" aria-label="Szenario auswählen">
+      <button class="seg-btn active" type="button" data-group="guide" data-panel="panel-auto">🚗 Auto</button>
+      <button class="seg-btn" type="button" data-group="guide" data-panel="panel-daheim">🏠 Daheim</button>
+      <button class="seg-btn" type="button" data-group="guide" data-panel="panel-cpr">🫀 HLW</button>
+      <button class="seg-btn" type="button" data-group="guide" data-panel="panel-trauma">🔥 Spezial</button>
+    </div>
+  </div>
+
+  <!-- Schwebende Haupt-Tab-Leiste unten -->
+  <nav class="tabbar" aria-label="Navigation">
+    <button type="button" data-target="view-start" data-subnav="subnav-start" aria-current="page">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>
+      </svg>
+      Start
+    </button>
+
+    <button type="button" data-target="view-guide" data-subnav="subnav-guide">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      Leitfaden
+    </button>
+
+    <button type="button" data-target="view-info" data-subnav="">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 16v-4"/>
+        <path d="M12 8h.01"/>
+      </svg>
+      Infos
+    </button>
+  </nav>
+
+  <script>
+    (function () {
+      // =====================================================================
+      // 1. Theme Switcher (Hell / Dunkel)
+      // =====================================================================
+      const root = document.documentElement;
+      const themeToggle = document.getElementById('themeToggle');
+      const iconSun = document.getElementById('iconSun');
+      const iconMoon = document.getElementById('iconMoon');
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        localStorage.setItem('erste-hilfe-theme', theme);
+        const isDark = theme === 'dark';
+        iconSun.style.display = isDark ? 'block' : 'none';
+        iconMoon.style.display = isDark ? 'none' : 'block';
+        if (metaTheme) metaTheme.setAttribute('content', isDark ? '#000000' : '#f5f5f7');
+      }
+
+      const savedTheme = localStorage.getItem('erste-hilfe-theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+
+      themeToggle.addEventListener('click', () => {
+        const current = root.getAttribute('data-theme');
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      });
+
+      // =====================================================================
+      // 2. Haupt-Tabbar & Sub-Bar Navigation
+      // =====================================================================
+      const navButtons = document.querySelectorAll('.tabbar button');
+      const views = document.querySelectorAll('.view');
+      const subbars = document.querySelectorAll('.subbar');
+
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.dataset.target;
+          const subnavId = btn.dataset.subnav;
+
+          views.forEach(v => v.classList.toggle('active', v.id === targetId));
+          subbars.forEach(s => s.classList.toggle('visible', s.id === subnavId));
+          document.body.classList.toggle('no-subbar', !subnavId);
+
+          navButtons.forEach(b => {
+            if (b === btn) b.setAttribute('aria-current', 'page');
+            else b.removeAttribute('aria-current');
+          });
+          window.scrollTo(0, 0);
+        });
+      });
+
+      const segButtons = document.querySelectorAll('.seg-btn');
+      segButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const group = btn.dataset.group;
+          const panelId = btn.dataset.panel;
+
+          document.querySelectorAll(`.seg-btn[data-group="${group}"]`).forEach(b => {
+            b.classList.toggle('active', b === btn);
+          });
+
+          document.querySelectorAll(`.sub-panel[data-group="${group}"]`).forEach(p => {
+            p.classList.toggle('active', p.id === panelId);
+          });
+          window.scrollTo(0, 0);
+        });
+      });
+
+      // =====================================================================
+      // 3. Interaktiver HLW-Taktgeber (110 BPM) mit Web Audio API
+      // =====================================================================
+      const metroToggleBtn = document.getElementById('metroToggleBtn');
+      const soundToggleBtn = document.getElementById('soundToggleBtn');
+      const pulseOrb = document.getElementById('pulseOrb');
+      const metroCountText = document.getElementById('metroCountText');
+
+      let metroTimer = null;
+      let beatCount = 0;
+      let soundEnabled = true;
+      let audioCtx = null;
+
+      function playClick(isAccent) {
+        if (!soundEnabled) return;
+        try {
+          if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+          }
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(isAccent ? 1050 : 780, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.065);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.07);
+        } catch (e) {}
+      }
+
+      function triggerBeat() {
+        beatCount = (beatCount % 30) + 1;
+        const isThirty = beatCount === 30;
+        pulseOrb.textContent = beatCount;
+        pulseOrb.classList.add('beat');
+        setTimeout(() => pulseOrb.classList.remove('beat'), 130);
+
+        if (isThirty) {
+          metroCountText.textContent = '30 erreicht → 2× beatmen (oder weiter drücken)';
+        } else {
+          metroCountText.textContent = `Druck ${beatCount} / 30 • 110 Schläge/Min.`;
+        }
+        playClick(beatCount === 1 || isThirty);
+      }
+
+      soundToggleBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundToggleBtn.textContent = soundEnabled ? '🔊' : '🔇';
+      });
+
+      metroToggleBtn.addEventListener('click', () => {
+        if (metroTimer) {
+          clearInterval(metroTimer);
+          metroTimer = null;
+          beatCount = 0;
+          pulseOrb.textContent = '110';
+          metroCountText.textContent = 'Rhythmus: „Stayin’ Alive“ • 30× drücken';
+          metroToggleBtn.textContent = '▶ Start';
+          metroToggleBtn.classList.remove('running');
+        } else {
+          triggerBeat();
+          metroTimer = setInterval(triggerBeat, Math.round(60000 / 110)); // 545 ms = 110 BPM
+          metroToggleBtn.textContent = '⏹ Stopp';
+          metroToggleBtn.classList.add('running');
+        }
+      });
+
+      // =====================================================================
+      // 4. Schnellfilter-Leiste & Akkordeons im Panel "Spezial"
+      // =====================================================================
+      const qfChips = document.querySelectorAll('.qf-chip');
+      const traumaAccs = document.querySelectorAll('.trauma-acc');
+
+      qfChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          const targetId = chip.dataset.targetAcc;
+          qfChips.forEach(c => c.classList.toggle('active', c === chip));
+
+          if (targetId === 'all') {
+            traumaAccs.forEach(acc => {
+              acc.style.display = '';
+              acc.open = true;
+            });
+          } else {
+            traumaAccs.forEach(acc => {
+              const match = acc.id === targetId;
+              acc.style.display = match ? '' : 'none';
+              if (match) acc.open = true;
+            });
+          }
+        });
+      });
+
+      // =====================================================================
+      // 5. PWA Service Worker Registrierung für GitHub Pages (Offline-Cache)
+      // =====================================================================
+      if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').then(() => {
+            const badge = document.getElementById('offlineBadge');
+            if (badge) badge.style.display = 'inline-block';
+          }).catch(() => {});
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
