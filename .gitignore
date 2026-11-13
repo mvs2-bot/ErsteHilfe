@@ -1,0 +1,6 @@
+# Lokale und System-Dateien, gehören nicht ins Repo
+.DS_Store
+Thumbs.db
+.env
+.env.*
+*.log
